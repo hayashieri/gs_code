@@ -1,5 +1,5 @@
 <?php
-//session_start();
+session_start();
 include "funcs.php";
 //sessChk();
 //セッションをチェックする（issetは存在するかどうかを確認するための関数）
@@ -10,6 +10,12 @@ $pdo = db_con();
 $stmt = $pdo->prepare("SELECT * FROM gs_select_table");
 $status = $stmt->execute();
 
+//function logact(){
+//	if(!isset($_SESSION["chk_ssid"])||$_SESSION["chk_ssid"] != session_id()){'<a href="newspage.php?id=' .$result["id"] .'">Continue reading</a>';
+//	}
+//		else{'<a href="login.php">Continue reading</a>';
+//	}};
+	
 //３．データ表示
 $view = "";
 if ($status == false) {
@@ -26,7 +32,12 @@ $view .= $result["title"]."</h3>";
 $view .= '<div class="mb-1 text-muted">'. $result["id"] .'</div>';
 $view .= '<p class="card-text mb-auto">';
 $view .= $result["naiyou"]."</p>";
-$view .= '<a href="login.php">全文を読む</a>';
+		
+		if( isset($_SESSION["chk_ssid"]))
+		{$view .='<a href="newspage.php?id=' .$result["id"] .'">Continue reading</a>';
+	}
+		else{$view .='<a href="login.php">Continue reading</a>';
+	};
 $view .='<a href="select.php">あとで読む</a>';
 $view .='</div>';
 $view .='<img class="card-img-right flex-auto d-none d-md-block" data-src="holder.js/200x250?theme=thumb" alt="Card image cap">';
@@ -65,8 +76,8 @@ $view .='</div></div>';
                 <a class="blog-header-logo text-dark" href="#">Gs News</a>
             </div>
             <div class="col-4 d-flex justify-content-end align-items-center">
-
-                <a class="btn btn-sm btn-outline-secondary" href="login.php">Sign up</a>
+				<a class="btn btn-sm btn-outline-secondary" href="toroku.php">アカウント登録</a>
+                <a class="btn btn-sm btn-outline-secondary" href="login.php">サインイン</a>
             </div>
         </div>
     </header>
@@ -107,7 +118,16 @@ $view .='</div></div>';
                     </h3>
                     <div class="mb-1 text-muted">Nov 12</div>
                     <p class="card-text mb-auto">日産自動車と仏ルノー、三菱自動車の日仏連合が自動運転分野で米グーグル陣営に参画する方針を固めた。共同で無人タクシーなどを開発し、自動運転車両を使うサービスの事業化も検討する。</p>
-                    <a href="login.php">Continue reading</a>
+				<?php
+	if(!isset($_SESSION["chk_ssid"])||$_SESSION["chk_ssid"] != session_id()){'<a href="newspage.php?id=' .$result["id"] .'">Continue reading</a>';
+	}
+		else{'<a href="login.php">Continue reading</a>';
+		
+	}
+	
+	?>
+				
+<!--                    <a href="login.php">Continue reading</a>-->
                     <a href="select.php">あとで読む</a>
                 </div>
                 <img class="card-img-right flex-auto d-none d-md-block" data-src="holder.js/200x250?theme=thumb" alt="Card image cap">

@@ -1,3 +1,51 @@
+<?php
+session_start();
+include "funcs.php";
+//sessChk();
+//セッションをチェックする（issetは存在するかどうかを確認するための関数）
+
+$pdo = db_con();
+
+//２．データ登録SQL作成
+$stmt = $pdo->prepare("SELECT * FROM gs_select_table");
+$status = $stmt->execute();
+
+//function logact(){
+//	if(!isset($_SESSION["chk_ssid"])||$_SESSION["chk_ssid"] != session_id()){'<a href="newspage.php?id=' .$result["id"] .'">Continue reading</a>';
+//	}
+//		else{'<a href="login.php">Continue reading</a>';
+//	}};
+	
+//３．データ表示
+$view = "";
+if ($status == false) {
+    sqlError($stmt);
+} else {
+    //Selectデータの数だけ自動でループしてくれる
+    //FETCH_ASSOC=http://php.net/manual/ja/pdostatement.fetch.php
+    while ($result = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $view .='<div class="col-md-6"><div class="card flex-md-row mb-4 box-shadow h-md-250">';
+$view .= '<div class="card-body d-flex flex-column align-items-start">';
+$view .='<strong class="d-inline-block mb-2 text-primary">World</strong>';
+$view .='<h3 class="mb-0">';
+$view .= $result["title"]."</h3>";
+$view .= '<div class="mb-1 text-muted">'. $result["id"] .'</div>';
+$view .= '<p class="card-text mb-auto">';
+$view .= $result["naiyou"]."</p>";
+		
+		if( isset($_SESSION["chk_ssid"]))
+		{$view .='<a href="newspage.php?id=' .$result["id"] .'">Continue reading</a>';
+	}
+		else{$view .='<a href="login.php">Continue reading</a>';
+	};
+$view .='<a href="select.php">あとで読む</a>';
+$view .='</div>';
+$view .='<img class="card-img-right flex-auto d-none d-md-block" data-src="holder.js/200x250?theme=thumb" alt="Card image cap">';
+$view .='</div></div>';
+    }
+}
+
+?>
 
 <!doctype html>
 <html lang="ja">
@@ -11,11 +59,11 @@
     <title>課題</title>
 
     <!-- Bootstrap core CSS -->
-    <link rel="stylesheet" href="https://getbootstrap.com/docs/4.1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
 
     <!-- Custom styles for this template -->
     <link href="https://fonts.googleapis.com/css?family=Playfair+Display:700,900" rel="stylesheet">
-    <link href="https://getbootstrap.com/docs/4.0/examples/blog/blog.css" rel="stylesheet">
+    <link href="css/blog.css" rel="stylesheet">
 </head>
 
 <body>
@@ -28,8 +76,8 @@
                 <a class="blog-header-logo text-dark" href="#">Gs News</a>
             </div>
             <div class="col-4 d-flex justify-content-end align-items-center">
-
-                <a class="btn btn-sm btn-outline-secondary" href="login.php">Sign up</a>
+				<a class="btn btn-sm btn-outline-secondary" href="toroku.php">アカウント登録</a>
+                <a class="btn btn-sm btn-outline-secondary" href="login.php">サインイン</a>
             </div>
         </div>
     </header>
@@ -60,7 +108,9 @@
     </div>
 
     <div class="row mb-2">
+        <?= $view ?>
         <div class="col-md-6">
+                    <div class="col-md-6">
             <div class="card flex-md-row mb-4 box-shadow h-md-250">
                 <div class="card-body d-flex flex-column align-items-start">
                     <strong class="d-inline-block mb-2 text-primary">World</strong>
@@ -68,30 +118,26 @@
                     </h3>
                     <div class="mb-1 text-muted">Nov 12</div>
                     <p class="card-text mb-auto">日産自動車と仏ルノー、三菱自動車の日仏連合が自動運転分野で米グーグル陣営に参画する方針を固めた。共同で無人タクシーなどを開発し、自動運転車両を使うサービスの事業化も検討する。</p>
-                    <a href="login.php">Continue reading</a>
-                    <a href="bookmark.php">あとで読む</a>
+				<?php
+	if(!isset($_SESSION["chk_ssid"])||$_SESSION["chk_ssid"] != session_id()){'<a href="newspage.php?id=' .$result["id"] .'">Continue reading</a>';
+	}
+		else{'<a href="login.php">Continue reading</a>';
+		
+	}
+	
+	?>
+				
+<!--                    <a href="login.php">Continue reading</a>-->
+                    <a href="select.php">あとで読む</a>
                 </div>
                 <img class="card-img-right flex-auto d-none d-md-block" data-src="holder.js/200x250?theme=thumb" alt="Card image cap">
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="card flex-md-row mb-4 box-shadow h-md-250">
-                <div class="card-body d-flex flex-column align-items-start">
-                    <strong class="d-inline-block mb-2 text-success">Design</strong>
-                    <h3 class="mb-0">
-                        <a class="text-dark" href="#">Post title</a>
-                    </h3>
-                    <div class="mb-1 text-muted">Nov 11</div>
-                    <p class="card-text mb-auto">This is a wider card with supporting text below as a natural lead-in to additional content.</p>
-                    <a href="#">Continue reading</a>
-                </div>
-                <img class="card-img-right flex-auto d-none d-md-block" data-src="holder.js/200x250?theme=thumb" alt="Card image cap">
-            </div>
         </div>
     </div>
 </div>
 
-<main role="main" class="container">
+<!--<main role="main" class="container">
     <div class="row">
         <div class="col-md-8 blog-main">
             <h3 class="pb-3 mb-4 font-italic border-bottom">
@@ -130,7 +176,7 @@
                 </ol>
                 <p>Cras mattis consectetur purus sit amet fermentum. Sed posuere consectetur est at lobortis.</p>
             </div><!-- /.blog-post -->
-
+<!--
             <div class="blog-post">
                 <h2 class="blog-post-title">Another blog post</h2>
                 <p class="blog-post-meta">December 23, 2013 by <a href="#">Jacob</a></p>
@@ -142,7 +188,7 @@
                 <p>Etiam porta <em>sem malesuada magna</em> mollis euismod. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur.</p>
                 <p>Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros.</p>
             </div><!-- /.blog-post -->
-
+<!--
             <div class="blog-post">
                 <h2 class="blog-post-title">New feature</h2>
                 <p class="blog-post-meta">December 14, 2013 by <a href="#">Chris</a></p>
@@ -170,7 +216,7 @@
                 <p class="mb-0">Etiam porta <em>sem malesuada magna</em> mollis euismod. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur.</p>
             </div>
 
-            <div class="p-3">
+<!--            <div class="p-3">
                 <h4 class="font-italic">Archives</h4>
                 <ol class="list-unstyled mb-0">
                     <li><a href="#">March 2014</a></li>
@@ -186,21 +232,21 @@
                     <li><a href="#">May 2013</a></li>
                     <li><a href="#">April 2013</a></li>
                 </ol>
-            </div>
+            </div>-->
 
-            <div class="p-3">
+<!--            <div class="p-3">
                 <h4 class="font-italic">Elsewhere</h4>
                 <ol class="list-unstyled">
                     <li><a href="#">GitHub</a></li>
                     <li><a href="#">Twitter</a></li>
                     <li><a href="#">Facebook</a></li>
                 </ol>
-            </div>
-        </aside><!-- /.blog-sidebar -->
+            </div>-->
+<!--        </aside><!-- /.blog-sidebar -->
 
-    </div><!-- /.row -->
+<!--    </div><!-- /.row -->
 
-</main><!-- /.container -->
+<!--</main><!-- /.container -->
 
 <footer class="blog-footer">
     <p>Blog template built for <a href="https://getbootstrap.com/">Bootstrap</a> by <a href="https://twitter.com/mdo">@mdo</a>.</p>
